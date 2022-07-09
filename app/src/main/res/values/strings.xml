@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">AppClassSemana6_v1</string>
+    <string name="valTitle">PERMISO DE LA CAMARA</string>
+    <string name="valTomarFoto">TOMAR FOTO</string>
+    <string name="valCompartirFoto">COMPARTIR FOTO</string>
+</resources>
