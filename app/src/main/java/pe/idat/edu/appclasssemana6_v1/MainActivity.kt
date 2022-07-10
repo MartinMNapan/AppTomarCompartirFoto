@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(view: View) {
         when(view.id){
             R.id.btnTomarFoto -> tomarFoto()
-                R.id.btnCompartir -> compartirFoto()
+            R.id.btnCompartir -> compartirFoto()
         }
     }
 
@@ -48,15 +48,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         if (validarPermisoAlmacenamieto()){
             try {
                 intencionTomarFoto()
-
             }catch(e:IOException){
                 e.printStackTrace()
             }
-
         }else{
             solicitarPermiso()
         }
-
     }
 
     @Throws(IOException::class)
@@ -79,10 +76,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-
-
     private fun compartirFoto() {
-
+        if (rutaFotoActual != ""){
+            val uriFoto = obtenerUri(File(rutaFotoActual))
+            val sendIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_STREAM, uriFoto)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                type = "image/jpeg"
+            }
+            val chooser: Intent = Intent.createChooser(sendIntent, "Compartir imagen")
+            if (sendIntent.resolveActivity(packageManager) != null){
+                startActivity(chooser)
+            }
+        }else{
+            Toast.makeText(applicationContext, "Debe tomar una foto para compartir", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun validarPermisoAlmacenamieto(): Boolean{
@@ -90,7 +99,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             applicationContext, android.Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
         var permiso = false
-        if (resultado == PackageManager.PERMISSION_DENIED) permiso = true
+        if (resultado == PackageManager.PERMISSION_GRANTED) permiso = true
         return permiso
     }
 
@@ -108,7 +117,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         grantResults: IntArray
     ) {
         if(requestCode == 1999){
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_DENIED){
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 intencionTomarFoto()
             }else{
                 Toast.makeText(applicationContext, "Permiso denegado, no puede utilizar la funcion",
@@ -152,5 +161,4 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             Uri.fromFile(archivo)
         }
     }
-
 }
